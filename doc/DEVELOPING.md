@@ -130,6 +130,10 @@ When a local agent run has no resolved project/session workspace, Paperclip fall
 
 This path honors `PAPERCLIP_HOME` and `PAPERCLIP_INSTANCE_ID` in non-default setups.
 
+For `codex_local`, Paperclip also manages a per-company Codex home under the instance root and seeds it from the shared Codex login/config home (`$CODEX_HOME` or `~/.codex`):
+
+- `~/.paperclip/instances/default/companies/<company-id>/codex-home`
+
 ## Worktree-local Instances
 
 When developing from multiple git worktrees, do not point two Paperclip servers at the same embedded PostgreSQL data directory.
@@ -201,6 +205,17 @@ paperclipai worktree init --from-instance default
 paperclipai worktree init --from-data-dir ~/.paperclip
 paperclipai worktree init --force
 ```
+
+Repair an already-created repo-managed worktree and reseed its isolated instance from the main default install:
+
+```sh
+cd ~/.paperclip/worktrees/PAP-884-ai-commits-component
+pnpm paperclipai worktree init --force --seed-mode minimal \
+  --name PAP-884-ai-commits-component \
+  --from-config ~/.paperclip/instances/default/config.json
+```
+
+That rewrites the worktree-local `.paperclip/config.json` + `.paperclip/.env`, recreates the isolated instance under `~/.paperclip-worktrees/instances/<worktree-id>/`, and preserves the git worktree contents themselves.
 
 **`pnpm paperclipai worktree:make <name> [options]`** — Create `~/NAME` as a git worktree, then initialize an isolated Paperclip instance inside it. This combines `git worktree add` with `worktree init` in a single step.
 
